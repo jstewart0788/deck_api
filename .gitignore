@@ -38,3 +38,6 @@ dist
 
 # Mac files
 .DS_Store
+
+#Hide personal password information in util files
+utils
