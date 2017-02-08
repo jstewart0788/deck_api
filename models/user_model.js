@@ -1,14 +1,16 @@
-var sequalize = require('../utils/db_connect.js');
+var Sequelize = require('sequelize');
+var db = require('../utils/db_connect.js');
 
-var User = sequelize.define('user', {
+var User = db.define('user', {
     id:{
-        type: Sequalize.INTEGER,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true
     },
     username:{
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     email: {
         type: Sequelize.STRING,
@@ -19,18 +21,31 @@ var User = sequelize.define('user', {
         defaultValue: 'default.png'
     },
     password: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT ,
         allowNull: false
+    }
+},{
+    classMethods:{
+        buildFromArgs: function(username, email, password, avatar){
+            this.create({
+                username: username,
+                email: email,
+                password: password,
+                avatar: avatar || 'default.jpg',
+            }).then(function(newUser){
+                console.log(" A new user has been added to DB");
+                console.log(newUser.get());
+            });
+        }
+    },
+    instanceMethods:{
+        changePassword:function(newPass){
+            this.set(password, newPass)
+            .then(function(user){
+                console.log(user + "'s  password has been updated");
+            })
+        }
     }
 });
 
-sequelize.sync().then(function() {
-  return User.create({
-    username: 'janedoe',
-    birthday: new Date(1980, 6, 20)
-  });
-}).then(function(jane) {
-  console.log(jane.get({
-    plain: true
-  }));
-});
+module.exports = User;
