@@ -14,7 +14,12 @@ var User = db.define('user', {
     },
     email: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
+        validate:{
+            isEmail:{
+                msg: "Must enter a valid email"
+            }
+        }
     },
     avatar: {
         type: Sequelize.STRING,
@@ -25,27 +30,31 @@ var User = db.define('user', {
         allowNull: false
     }
 },{
+    underscored:true,
     classMethods:{
         buildFromArgs: function(username, email, password, avatar){
-            this.create({
+            return this.build({
                 username: username,
                 email: email,
                 password: password,
                 avatar: avatar || 'default.jpg',
-            }).then(function(newUser){
-                console.log(" A new user has been added to DB");
-                console.log(newUser.get());
             });
         }
     },
     instanceMethods:{
-        changePassword:function(newPass){
-            this.set(password, newPass)
-            .then(function(user){
-                console.log(user + "'s  password has been updated");
-            })
+        changePassword: function(newPass){
+            this.set('password', newPass)
+            return this.save();
         }
     }
 });
 
+User.sync({force:true}).then(function(){
+   var  rick = User.buildFromArgs("rick", "rick@dude.com", "gsdfgsg" );
+   console.log(rick.get());
+    rick.changePassword("newPass")
+    console.log(rick.get());
+}); 
+
 module.exports = User;
+
