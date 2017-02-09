@@ -1,5 +1,6 @@
 var Sequelize = require('sequelize');
 var db = require('../utils/db_connect.js');
+var bcrypt = require('bcryptjs');
 
 var User = db.define('user', {
     id:{
@@ -10,7 +11,7 @@ var User = db.define('user', {
     username:{
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
+        unique: true,
     },
     email: {
         type: Sequelize.STRING,
@@ -27,7 +28,12 @@ var User = db.define('user', {
     },
     password: {
         type: Sequelize.TEXT ,
-        allowNull: false
+        allowNull: false,
+        set: function(pass){
+            var salt = bcrypt.genSaltSync(10);
+            var hash = bcrypt.hashSync(pass, salt);
+            this.setDataValue('password', hash);
+        }
     }
 },{
     underscored:true,
@@ -45,6 +51,12 @@ var User = db.define('user', {
         changePassword: function(newPass){
             this.set('password', newPass)
             return this.save();
+        },
+        comparePassword: function(password, cb){
+            bcrypt.compare(password, this.get('password'), function(err, isMatch) {
+                if (err) return cb(err);
+                cb(null, isMatch);
+            });
         }
     }
 });
