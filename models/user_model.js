@@ -61,12 +61,12 @@ var User = db.define('user', {
     }
 });
 
-User.sync({force:true}).then(function(){
-   var  rick = User.buildFromArgs("rick", "rick@dude.com", "gsdfgsg" );
-   console.log(rick.get());
-    rick.changePassword("newPass")
-    console.log(rick.get());
-}); 
+// User.sync({force:true}).then(function(){
+//    var  rick = User.buildFromArgs("rick", "rick@dude.com", "gsdfgsg" );
+//    console.log(rick.get());
+//     rick.changePassword("newPass")
+//     console.log(rick.get());
+// }); 
 
 module.exports = User;
 
